@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Collections;
-using UnityEditor;
 using UnityEngine;
 using Object = System.Object;
+
 
 public class TestBehaviour : MonoBehaviour
 {
@@ -24,9 +22,14 @@ public class TestBehaviour : MonoBehaviour
 interface IHoardable
 {
     void Collect<T>(params T[] collectedObjects);
+
+    /// <summary>
+    /// Intended to distinguish different instances of IHoardables
+    /// </summary>
+    Object UniqueValue { get; set; }
 }
 
-interface IDistributable
+public interface IDistributable
 {
     void DistributeByType<T>(params IHoardable[] hoardTypes);
     
@@ -48,6 +51,7 @@ struct TransferableObject
 
 class ObjectStorage<T> : IHoardable
 {
+    
     private List<T> hoardedObjects;
     
     public ObjectStorage(params T[] initialObjects)
@@ -55,10 +59,12 @@ class ObjectStorage<T> : IHoardable
         hoardedObjects = new List<T>(initialObjects);
     }
 
-    public void Collect<T>(params T[] collectedObject)
+    public virtual void Collect<T>(params T[] collectedObject)
     {
-        throw new System.NotImplementedException();
+        
     }
+
+    public object UniqueValue { get; set; }
 }
 
 struct ConditionTypeList
@@ -69,24 +75,39 @@ struct ConditionTypeList
 class ObjectDispenser : IDistributable
 {
 
-    void TestFunc()
-    {
-        
-    }
-
-    public void DistributeByType<T>(params IHoardable[] hoardTypes)
+    public virtual void DistributeByType<T>(params IHoardable[] hoardTypes)
     {
         throw new NotImplementedException();
     }
 
-    public void DistributeAllTo()
+    public virtual void DistributeAllTo()
     {
         throw new NotImplementedException();
     }
 
-    public void DistributeBySort(ConditionTypeList conditionTypes)
+    public virtual void DistributeBySort(ConditionTypeList conditionTypes)
     {
         throw new NotImplementedException();
     }
+    
+}
 
+static class ObjectOverseer
+{
+    private static Dictionary< string, IHoardable> hoardDictionary;
+    private static IDistributable distributor;
+
+    public static void ObtainNewHoard(params IHoardable[] hoards)
+    {
+        hoardDictionary = new Dictionary<string, IHoardable>();
+        foreach (var hoard in hoards)
+        {
+            hoardDictionary.Add(hoard.UniqueValue.ToString(), hoard);
+        }
+    }
+
+    static ObjectOverseer()
+    {
+        hoardDictionary = new Dictionary<string, IHoardable>();
+    }
 }
