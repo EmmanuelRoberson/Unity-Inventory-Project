@@ -14,6 +14,9 @@ public class TestScript : MonoBehaviour
 
     public Text textObj;
 
+    [SerializeField]
+    public List<TransferableObject> ViewableList;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,12 +27,14 @@ public class TestScript : MonoBehaviour
             {UniqueValue = "TestObject"};
         
         objDispenser = new ObjectDispenser();
+        ViewableList = objStorage.hoardedObjects;
     }
 
     // Update is called once per frame
     void Update()
     {
         textObj.text = "Item Count:" + objStorage.hoardedObjects.Count;
+        ViewableList = objStorage.hoardedObjects;
     }
 
     public void CollectObject()
